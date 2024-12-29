@@ -6,7 +6,7 @@ export default function DashboardVideos() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [videoName, setVideoName] = useState([]);
   const [videoSignedUrl, setVideoSignedUrl] = useState("");
-
+  const [sessionToken, setSessionToken] = useState("");
   const [JWTStreamToken, setJWTStreamToken] = useState("");
   const [user, setUser] = useState({
     name: "John Doe",
@@ -25,14 +25,12 @@ export default function DashboardVideos() {
 
   const fetchVideos = async () => {
     try {
-      console.log("Fetching videos from the server...");
-      const sessionToken = await fetchToken();
       const response = await fetch(
-        "https://asia-south1-controller-445319.cloudfunctions.net/controller-service-2/controller",
+        "http://localhost:5000/controller",
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${sessionToken}`,
+            Authorization: `Bearer ${await fetchToken()}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ event: "get-all-videos" }),
@@ -74,13 +72,14 @@ export default function DashboardVideos() {
     setVideoName((prev) => prev.filter((video) => video.videoName !== vidName));
 
     // Proceed with the backend call
-    fetchToken().then((sessionToken) => {
+    console.log(" before Deleting video from server:",sessionToken);
+    fetchToken().then(async(sessionToken) => {
       fetch(
-        "https://us-central1-controller-445319.cloudfunctions.net/controller-service/controller",
+        "http://localhost:5000/controller",
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${sessionToken}`,
+            Authorization: `Bearer ${await fetchToken()}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ event: "delete", fileName: fileId }),
@@ -105,39 +104,46 @@ export default function DashboardVideos() {
   const playVideoHandler = async (fileId) => {
     try {
       console.log("Playing video:", fileId);
+  
+      // Fetch the signed URL for the video
       const videoResponse = await fetch(
-        `https://asia-south1-controller-445319.cloudfunctions.net/controller-service-2/stream/${fileId}`,
+        `http://localhost:5000/stream/${fileId}`,
         {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${sessionToken}`,
+            Authorization: `Bearer ${await fetchToken()}`, // Ensure fetchToken resolves correctly
             "Content-Type": "application/json",
           },
         }
       );
-
+  
       if (videoResponse.ok) {
-        const data = await videoResponse;
-
-      
-        
-
-        const newWindow = window.open();
-        if (newWindow) {
-          console.log("Opening video in new window.");
-          newWindow.document.write(`
-            <html>
-              <head>
-                <title>Video Player</title>
-              </head>
-              <body style="margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #000;">
-                <video controls autoplay style="max-width: 100%; max-height: 100%;">
-                  <source src="${data.signedUrl}" type="video/mp4">
-                  Your browser does not support the video tag.
-                </video>
-              </body>
-            </html>
-          `);
+        // Parse the JSON response to get the signed URL
+        const data = await videoResponse.json();
+  
+        if (data.signedUrl) {
+          // Open a new window and embed the video player
+          const newWindow = window.open();
+          if (newWindow) {
+            console.log("Opening video in new window.");
+            newWindow.document.write(`
+              <html>
+                <head>
+                  <title>Video Player</title>
+                </head>
+                <body style="margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #000;">
+                  <video controls autoplay style="max-width: 100%; max-height: 100%;">
+                    <source src="${data.signedUrl}" type="video/mp4">
+                    Your browser does not support the video tag.
+                  </video>
+                </body>
+              </html>
+            `);
+          } else {
+            console.error("Failed to open a new window. It may be blocked by the browser.");
+          }
+        } else {
+          console.error("Signed URL is missing in the response:", data);
         }
       } else {
         console.error(
@@ -150,6 +156,7 @@ export default function DashboardVideos() {
       console.error("Error playing video:", e);
     }
   };
+  
 
   useEffect(() => {
     const fetchData = async () => {

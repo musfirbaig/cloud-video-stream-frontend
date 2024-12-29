@@ -4,7 +4,7 @@ import { ClerkProvider } from "@clerk/clerk-react";
 import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 
-const PUBLISHABLE_KEY = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
+const PUBLISHABLE_KEY = "pk_test_d2VsY29tZWQtZWdyZXQtNi5jbGVyay5hY2NvdW50cy5kZXYk";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

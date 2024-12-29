@@ -20,7 +20,7 @@ export default function Stats() {
     try {
       const token = await fetchToken();
       const response = await fetch(
-        "https://us-central1-controller-445319.cloudfunctions.net/controller-service/controller",
+        "http://localhost:5000/controller",
         {
           method: "POST",
           headers: {
@@ -58,7 +58,7 @@ export default function Stats() {
             <div className="bg-gray-200 rounded-full h-4 w-full">
               <div
                 className="bg-blue-500 h-4 rounded-full"
-                style={{ width: `${(storage / 50) * 100}%` }}
+                style={{ width: `${ 50 - (storage / 50) * 100}%` }}
               ></div>
             </div>
             <p className="text-sm text-gray-500 mt-1">
@@ -71,7 +71,7 @@ export default function Stats() {
             <div className="bg-gray-200 rounded-full h-4 w-full">
               <div
                 className="bg-green-500 h-4 rounded-full"
-                style={{ width: `${(bandwidth / 100) * 100}%` }}
+                style={{ width: `${100-(bandwidth / 100) * 100}%` }}
               ></div>
             </div>
             <p className="text-sm text-gray-500 mt-1">
