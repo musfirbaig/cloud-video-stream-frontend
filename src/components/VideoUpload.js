@@ -404,15 +404,17 @@ export default function VideoUpload({ onUploadSuccess }) {
 
   const handleUpload = async (e) => {
     e.preventDefault();
-
+  
     if (!file) {
       console.error("No file selected for upload.");
       toast.error("Please select a file to upload.");
       return;
     }
-
+  
     try {
       setIsUploading(true); // Show uploading graphic
+      const formData = new FormData();
+      formData.append("file", file);
       const sessionToken = await fetchToken();
       if (!sessionToken) {
         console.error("No session token available.");
@@ -421,19 +423,16 @@ export default function VideoUpload({ onUploadSuccess }) {
         return;
       }
       console.log("Session Token: ", sessionToken);
-
-      const response = await fetch(
-        "https://us-central1-controller-445319.cloudfunctions.net/controller-service/controller",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${sessionToken}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ event: "upload" }),
-        }
-      );
-
+  
+      const response = await fetch("https://asia-south1-controller-445319.cloudfunctions.net/controller-service-2/upload", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${sessionToken}`, // Include Authorization header
+          // Don't set Content-Type - browser will set it automatically
+        },
+        body: formData,
+      });
+  
       if (!response.ok) {
         const errorText = await response.text();
         console.error(
@@ -446,49 +445,24 @@ export default function VideoUpload({ onUploadSuccess }) {
         setIsUploading(false);
         return;
       }
-
-      const { token } = await response.json();
-      console.log("Upload Token:", token);
-
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const responseUpload = await fetch(
-        "https://storage-service-796253357501.us-central1.run.app/upload",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        }
-      );
-
-      if (responseUpload.ok) {
+  
+      if (response.ok) {
         console.log("File uploaded successfully.");
-
+  
         setShowSuccessMessage(true);
         setTimeout(() => setShowSuccessMessage(false), 3000); // Show success message
         fetchUpdatedVideos();
         setFile(null);
-      } else {
-        const errorText = await responseUpload.text();
-        console.error(
-          "Error uploading file:",
-          responseUpload.status,
-          responseUpload.statusText,
-          errorText
-        );
-        toast.error(`Failed to upload video: ${errorText}`);
       }
     } catch (e) {
-      console.error("Error during upload:", e);
-      toast.error("An unexpected error occurred during upload.");
+      console.error("Error during file upload:", e);
+      toast.error("An error occurred during file upload.");
     } finally {
       setUploadProgress(0);
       setIsUploading(false); // Hide uploading graphic
     }
   };
+  
 
   const fetchUpdatedVideos = async () => {
     try {
