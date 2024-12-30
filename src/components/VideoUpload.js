@@ -424,7 +424,7 @@ export default function VideoUpload({ onUploadSuccess }) {
       }
       console.log("Session Token: ", sessionToken);
   
-      const response = await fetch("http://localhost:5000/upload", {
+      const response = await fetch("https://controller3-796253357501.asia-south1.run.app/upload", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${sessionToken}`, // Include Authorization header
@@ -468,7 +468,7 @@ export default function VideoUpload({ onUploadSuccess }) {
     try {
       const sessionToken = await fetchToken();
       const response = await fetch(
-        "https://us-central1-controller-445319.cloudfunctions.net/controller-service/controller",
+        "https://asia-south1-controller-445319.cloudfunctions.net/controller-service-2/controller",
         {
           method: "POST",
           headers: {

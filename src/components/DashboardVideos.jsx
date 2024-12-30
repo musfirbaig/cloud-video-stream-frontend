@@ -25,8 +25,10 @@ export default function DashboardVideos() {
 
   const fetchVideos = async () => {
     try {
+      console.log("token : ");
+      console.log(await fetchToken());
       const response = await fetch(
-        "http://localhost:5000/controller",
+        "https://controller3-796253357501.asia-south1.run.app/controller",
         {
           method: "POST",
           headers: {
@@ -69,13 +71,13 @@ export default function DashboardVideos() {
     console.log("Deleting video:", vidName);
 
     // Instantly update the UI
-    setVideoName((prev) => prev.filter((video) => video.videoName !== vidName));
+    setVideoName((prev) => prev.filter((video) => video.fileId !== fileId));
 
     // Proceed with the backend call
     console.log(" before Deleting video from server:",sessionToken);
     fetchToken().then(async(sessionToken) => {
       fetch(
-        "http://localhost:5000/controller",
+        "https://controller3-796253357501.asia-south1.run.app/controller",
         {
           method: "POST",
           headers: {
@@ -107,7 +109,7 @@ export default function DashboardVideos() {
   
       // Fetch the signed URL for the video
       const videoResponse = await fetch(
-        `http://localhost:5000/stream/${fileId}`,
+        `https://controller3-796253357501.asia-south1.run.app/stream/${fileId}`,
         {
           method: "GET",
           headers: {
@@ -122,6 +124,7 @@ export default function DashboardVideos() {
         const data = await videoResponse.json();
   
         if (data.signedUrl) {
+          console.log("Playing video:", data.signedUrl);
           // Open a new window and embed the video player
           const newWindow = window.open();
           if (newWindow) {
