@@ -20,7 +20,7 @@ export default function Stats() {
     try {
       const token = await fetchToken();
       const response = await fetch(
-        "http://localhost:5000/controller",
+        "https://controller3-796253357501.asia-south1.run.app/controller",
         {
           method: "POST",
           headers: {
@@ -62,7 +62,7 @@ export default function Stats() {
               ></div>
             </div>
             <p className="text-sm text-gray-500 mt-1">
-              {storage.toFixed(2)} MB used out of 50 MB
+              {storage.toFixed(2)} MB remaining out of 50 MB
             </p>
           </div>
 
@@ -75,7 +75,7 @@ export default function Stats() {
               ></div>
             </div>
             <p className="text-sm text-gray-500 mt-1">
-              {bandwidth.toFixed(2)} MB used out of 100 MB
+              {bandwidth.toFixed(2)} MB remaining out of 100 MB
             </p>
           </div>
         </div>
