@@ -58,7 +58,7 @@ export default function Stats() {
             <div className="bg-gray-200 rounded-full h-4 w-full">
               <div
                 className="bg-blue-500 h-4 rounded-full"
-                style={{ width: `${ 50 - (storage / 50) * 100}%` }}
+                style={{ width: `${ 50 - storage}%` }}
               ></div>
             </div>
             <p className="text-sm text-gray-500 mt-1">
